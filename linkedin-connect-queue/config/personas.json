@@ -1,0 +1,76 @@
+{
+  "_comment": "Four target personas. 'queries' are LinkedIn people-search keyword strings; {company} is substituted. 'notes' are tried longest-first and the first one that fits LinkedIn's 300-char invite limit wins.",
+
+  "note_char_limit": 300,
+
+  "personas": {
+    "hiring_manager": {
+      "label": "Hiring manager / AI & data lead",
+      "weight": 40,
+      "why": "A yes here often converts straight to an interview. Slowest to accept.",
+      "queries": [
+        "\"{company}\" (\"Head of Analytics\" OR \"Director Analytics\")",
+        "\"{company}\" (\"Data Science\" OR \"Decision Science\") (Head OR Director OR Manager)",
+        "\"{company}\" (\"AI\" OR \"Automation\") (Lead OR Manager OR Director)",
+        "\"{company}\" (\"Digital & Technology\" OR \"D&T\") (Manager OR Director)"
+      ],
+      "notes": [
+        "Hi {first}, saw {company} is hiring {a_role}. I'm an engineer ({exp}) deliberately moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery. Would value connecting and following how your team adopts AI.",
+        "Hi {first}, saw {company_poss} {role} opening. Engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirements, now low-code. Would love to connect.",
+        "Hi {first}, saw {company_poss} {role} role. Engineer moving into AI-enabled business analysis. Would love to connect."
+      ]
+    },
+
+    "recruiter_inhouse": {
+      "label": "In-house recruiter / TA",
+      "weight": 30,
+      "why": "High accept rate and fast, but they screen on keyword fit - lead with the role name.",
+      "queries": [
+        "\"{company}\" (\"Talent Acquisition\" OR \"Recruiter\")",
+        "\"{company}\" (\"Campus\" OR \"Early Career\" OR \"Graduate\") (Recruiter OR \"Talent Acquisition\")",
+        "\"{company}\" \"Technology Recruiter\" India"
+      ],
+      "notes": [
+        "Hi {first}, I've applied to {company_poss} {role} ({location}). Engineer, {exp}: SAP/CRM requirement gathering plus low-code delivery, B.Tech CSE (AI). Moving into AI-enabled business analysis. Happy to share my CV - would love to connect.",
+        "Hi {first}, I've applied to {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. Happy to share my CV - would love to connect.",
+        "Hi {first}, I've applied to {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI). Would love to connect."
+      ]
+    },
+
+    "peer_in_role": {
+      "label": "Peer already in the role",
+      "weight": 20,
+      "why": "Referrals are the highest-conversion path in India. Ask about their move, never for a job in the first note.",
+      "queries": [
+        "\"{company}\" \"D&T Analyst\"",
+        "\"{company}\" (\"AI & Automation\" OR \"AI Enablement\") Analyst",
+        "\"{company}\" (\"Business Analyst\" AND (AI OR Automation OR \"low-code\"))"
+      ],
+      "notes": [
+        "Hi {first}, you're doing the kind of {role} work at {company} I'm working toward. I'm an engineer ({exp}) - SAP/CRM requirements, now low-code - moving into AI-enabled business analysis. Would love to connect and hear how you made the move.",
+        "Hi {first}, you do the {role} work at {company} I'm aiming for. Engineer ({exp}) moving into AI-enabled business analysis. Would love to connect and hear how you made the move.",
+        "Hi {first}, you're in the {role} work I'm aiming for. Would love to connect and hear how you made the move."
+      ]
+    },
+
+    "agency_recruiter": {
+      "label": "Agency / staffing recruiter",
+      "weight": 10,
+      "why": "Highest lead volume, lowest quality per lead. Give them your parameters up front so they filter themselves.",
+      "queries": [
+        "(\"AI\" OR \"Analytics\") Recruiter India (Staffing OR \"Executive Search\")",
+        "\"Business Analyst\" Recruiter (Gurugram OR \"Delhi NCR\" OR Mumbai) staffing",
+        "\"hiring\" \"Business Analyst\" \"AI\" India recruiter"
+      ],
+      "notes": [
+        "Hi {first}, I see you place AI/analytics talent in India. I'm an engineer ({exp}) - SAP/CRM requirement gathering, low-code delivery, B.Tech CSE (AI) - targeting AI & Automation / D&T analyst roles in Delhi NCR, Mumbai or remote. Would love to connect.",
+        "Hi {first}, you place AI/analytics talent in India. Engineer ({exp}), B.Tech CSE (AI), targeting AI & Automation / D&T analyst roles (Delhi NCR/Mumbai/remote). Would love to connect.",
+        "Hi {first}, engineer ({exp}) targeting AI & Automation / D&T analyst roles in India. Would love to connect."
+      ]
+    }
+  },
+
+  "followup_after_accept": "Thanks for connecting, {first}! I'm focused on AI & Automation / D&T analyst roles - {exp} as an engineer (SAP/CRM requirement gathering, now low-code delivery), B.Tech CSE (AI). If something entry-level opens at {company}, I'd love to be considered - happy to send my CV.",
+
+  "generic_role_fallback": "AI & Automation analyst"
+}

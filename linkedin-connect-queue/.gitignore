@@ -1,0 +1,5 @@
+# Generated daily queues — rebuilt every run
+out/
+
+# Outreach state: contains third-party names. Keep it local, back it up yourself.
+state/

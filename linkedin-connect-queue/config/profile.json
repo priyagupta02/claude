@@ -1,0 +1,70 @@
+{
+  "_comment": "Edit this file as your situation changes. Everything downstream reads from here.",
+
+  "candidate": {
+    "first_name": "Priya",
+    "full_name": "Priya Gupta",
+    "linkedin": "https://www.linkedin.com/in/priyagupta02/",
+    "github": "https://github.com/priyagupta02",
+    "email": "priyagupta02022@gmail.com",
+    "phone": "+91 8700780638",
+    "base_city": "Gurugram",
+    "experience_label": "~2 yrs",
+    "experience_months": 22,
+    "degree": "B.Tech CSE (AI), GCET 2024",
+    "current": "Associate Software Developer, Primathon (Digia low-code + Flutter)",
+    "prior": "Graduate Engineer Trainee, Somany Ceramics (SAP/CRM requirement gathering)",
+    "resume_path": "/Users/priyagupta/Downloads/Priya_Gupta_BA_Resume.pdf",
+    "tailored_resume_dir": "/Users/priyagupta/Downloads/Tailored_Resumes"
+  },
+
+  "honesty_rules": [
+    "Never claim the title 'Business Analyst' for past roles. Somany was Graduate Engineer Trainee (SAP/CRM functional).",
+    "Never claim production SQL, advanced Power BI, or ML engineering experience.",
+    "Frame as: engineer with requirement-gathering + low-code delivery experience, deliberately moving into AI-enabled business analysis.",
+    "Never invent a mutual connection, referral, or shared school/employer."
+  ],
+
+  "search": {
+    "target_titles": [
+      "Associate D&T Analyst",
+      "D&T Analyst",
+      "Digital & Technology Analyst",
+      "AI & Automation Analyst",
+      "AI Enablement Analyst",
+      "AI Solutions Analyst",
+      "Automation Analyst",
+      "Business Analyst AI",
+      "Business Analyst GenAI",
+      "Business Analyst Low-code",
+      "Associate Business Analyst AI",
+      "Product Analyst AI"
+    ],
+    "locations": ["Gurugram", "Delhi NCR", "Noida", "Pune", "Mumbai", "Bangalore", "Hyderabad", "Remote"],
+    "india_geo_urn": "102713980",
+    "max_role_min_experience_years": 2,
+    "min_salary_lpa": 12,
+    "max_posting_age_days": 15
+  },
+
+  "limits": {
+    "_comment": "LinkedIn throttles invites at roughly 100-200/week and will restrict an account that looks automated. 12/day = 84/week, deliberately under.",
+    "invites_per_day": 12,
+    "max_per_company_per_run": 2,
+    "followup_after_days": 7,
+    "recontact_company_after_days": 45
+  },
+
+  "companies": {
+    "tier1_fmcg_consumer": [
+      "General Mills", "Hindustan Unilever", "Unilever", "Nestle", "Procter & Gamble",
+      "PepsiCo", "Coca-Cola", "Mondelez", "ITC", "Reckitt", "Diageo",
+      "Colgate-Palmolive", "Kellanova", "Danone", "Mars", "AB InBev",
+      "Kimberly-Clark", "Britannia", "Marico", "Dabur", "Godrej Consumer Products", "L'Oreal"
+    ],
+    "tier2_gcc_consulting": [
+      "IBM", "EY", "PwC", "Deloitte", "KPMG", "Accenture", "TCS", "Genpact",
+      "Capgemini", "Infosys", "Wipro", "Cognizant"
+    ]
+  }
+}

@@ -47,6 +47,14 @@
     "max_posting_age_days": 15
   },
 
+  "linkedin_account": {
+    "_comment": "Free accounts get ~3 personalized notes PER MONTH and cap them at 200 chars. Premium gets unlimited notes at 300 chars. Set this honestly or the queue will hand you notes you cannot send.",
+    "type": "premium",
+    "note_char_limit_free": 200,
+    "note_char_limit_premium": 300,
+    "personalized_notes_per_month": 3
+  },
+
   "limits": {
     "_comment": "LinkedIn throttles invites at roughly 100-200/week and will restrict an account that looks automated. 12/day = 84/week, deliberately under.",
     "invites_per_day": 12,

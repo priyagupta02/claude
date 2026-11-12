@@ -38,7 +38,7 @@ SENT_CSV = os.path.join(STATE_DIR, "outreach_sent.csv")
 
 SENT_FIELDS = [
     "date", "company", "persona", "person_name", "person_url",
-    "role", "note_sent", "status", "status_date", "notes",
+    "role", "with_note", "note_sent", "status", "status_date", "notes",
 ]
 
 # Your existing daily-task logs. Missing files are skipped without complaint,
@@ -204,7 +204,7 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
     limits = profile["limits"]
     search_cfg = profile["search"]
     geo = search_cfg.get("india_geo_urn")
-    note_limit = personas_cfg.get("note_char_limit", 300)
+    note_limit, _ = note_limit_for(profile, personas_cfg)
     personas = personas_cfg["personas"]
     generic_role = personas_cfg.get("generic_role_fallback", "AI & Automation analyst")
 
@@ -267,7 +267,44 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
             continue
         counts[r["company"]] = counts.get(r["company"], 0) + 1
         chosen.append(r)
+
+    # Spend the scarce personalised notes on the targets where a note earns its
+    # keep: hiring managers and peers. Everyone else gets a plain invite, and the
+    # real pitch goes as a message once they accept, where there is no limit.
+    _, budget = note_limit_for(profile, personas_cfg)
+    remaining = max(0, budget - notes_used_this_month(sent))
+    note_first = {"hiring_manager": 0, "peer_in_role": 1, "recruiter_inhouse": 2,
+                  "agency_recruiter": 3}
+    for i, r in enumerate(sorted(chosen, key=lambda r: (note_first.get(r["persona"], 9),
+                                                        -r["score"]))):
+        r["with_note"] = i < remaining
+    for r in chosen:
+        r["after_accept"] = personas_cfg["followup_after_accept"].format(
+            first="{first_name}", company=r["company"], exp=cand["experience_label"])
     return chosen, rows
+
+
+def notes_used_this_month(sent):
+    """Personalised notes are a scarce monthly resource on a free account."""
+    n = 0
+    for row in sent:
+        if (row.get("with_note") or "").strip().lower() not in ("yes", "true", "1"):
+            continue
+        d = parse_date(row.get("date"))
+        if d and (d.year, d.month) == (TODAY.year, TODAY.month):
+            n += 1
+    return n
+
+
+def note_limit_for(profile, personas_cfg):
+    acct = profile.get("linkedin_account") or {}
+    if not acct:
+        return personas_cfg.get("note_char_limit", 300), 999
+    premium = (acct.get("type") or "free").lower() == "premium"
+    limit = acct.get("note_char_limit_premium" if premium else "note_char_limit_free",
+                     300 if premium else 200)
+    budget = 999 if premium else int(acct.get("personalized_notes_per_month", 3))
+    return int(limit), budget
 
 
 def due_followups(profile, personas_cfg, sent):
@@ -310,6 +347,8 @@ h1{font-size:22px;margin:0 0 4px}
 .co{font-weight:650;font-size:16px}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--mut)}
 .tag.ap{color:var(--acc);border-color:var(--acc)}
+.tag.note{color:var(--warn);border-color:var(--warn);font-weight:600}
+.plain{font-size:12.5px;color:var(--mut);margin-bottom:7px}
 .meta{color:var(--mut);font-size:13px;margin-bottom:9px}
 .why{color:var(--mut);font-size:12.5px;font-style:italic;margin-bottom:10px}
 .lnks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
@@ -341,7 +380,9 @@ document.querySelectorAll('textarea[data-lim]').forEach(t=>{
 
 def render_html(profile, personas_cfg, chosen, applied, followups, total_candidates):
     cand = profile["candidate"]
-    lim = personas_cfg.get("note_char_limit", 300)
+    lim, budget = note_limit_for(profile, personas_cfg)
+    acct = (profile.get("linkedin_account") or {}).get("type", "free")
+    with_note_n = sum(1 for r in chosen if r.get("with_note"))
     e = html.escape
     p = [HTML_HEAD]
     p.append("<h1>LinkedIn connect queue</h1>")
@@ -352,18 +393,22 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
 
     p.append('<div class="bar">')
     p.append('<span class="chip">%d companies in your application log</span>' % len(applied))
-    p.append('<span class="chip">invite note limit %d chars</span>' % lim)
+    p.append('<span class="chip">%s account &middot; note limit %d chars</span>' % (e(acct), lim))
+    p.append('<span class="chip">%d of today\'s %d get a note (%s/month budget)</span>'
+             % (with_note_n, len(chosen), "unlimited" if budget > 900 else budget))
     p.append('<span class="chip">%d follow-ups due</span>' % len(followups))
     p.append('<a class="btn" target="_blank" rel="noopener" href="%s">Fresh job postings &rarr;</a>'
              % e(jobs_url(profile["search"]["target_titles"], profile["search"].get("india_geo_urn"))))
     p.append("</div>")
 
-    p.append('<div class="note"><b>How to work this queue.</b> For each card: open a search link, '
-             "pick a real person who fits, replace <code>{first_name}</code> with their first name, "
-             "copy the note, and send the invite with it attached. Then record it: "
-             "<code>python3 build_queue.py log --company \"...\" --persona ... --name \"...\"</code> "
-             "so tomorrow's queue skips them. Send these by hand &mdash; automating LinkedIn invites "
-             "gets accounts restricted, and a hand-sent note with a real name converts far better.</div>")
+    p.append('<div class="note"><b>How to work this queue.</b> Open a search link, pick a real person '
+             "who fits, then look at the badge. <b>WITH NOTE</b> &rarr; click Connect, choose "
+             "\u201cAdd a note\u201d, paste the note with <code>{first_name}</code> replaced. "
+             "<b>PLAIN INVITE</b> &rarr; just click Connect with no note, and send the "
+             "<i>after they accept</i> message as a normal DM once they do &mdash; that has no "
+             "character limit and does not spend your monthly note budget. Record each one with "
+             "<code>build_queue.py log</code> so tomorrow skips them. Send by hand: automating "
+             "invites gets accounts restricted.</div>")
 
     p.append("<h2>Today&rsquo;s queue</h2>")
     for i, r in enumerate(chosen, 1):
@@ -371,7 +416,10 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
         p.append('<div class="card"><div class="top"><span class="rank">%d</span>'
                  '<span class="co">%s</span><span class="tag">%s</span>%s</div>'
                  % (i, e(r["company"]), e(r["persona_label"]),
-                    '<span class="tag ap">applied</span>' if r["applied"] else ""))
+                    ("" if budget > 900 else
+                     ('<span class="tag note">WITH NOTE</span>' if r.get("with_note")
+                      else '<span class="tag">plain invite</span>'))
+                    + ('<span class="tag ap">applied</span>' if r["applied"] else "")))
         p.append('<div class="meta">%s &middot; %s%s</div>'
                  % (e(r["role"]), e(r["location"]),
                     " &middot; from " + e(r["applied_sources"]) if r["applied_sources"] else ""))
@@ -381,12 +429,21 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
             p.append('<a class="btn" target="_blank" rel="noopener" href="%s" title="%s">Search %d</a>'
                      % (e(u), e(q), j))
         p.append("</div>")
-        p.append('<textarea id="%s" data-lim="%d" spellcheck="false">%s</textarea>'
-                 % (nid, lim, e(r["note"])))
-        p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy note</button>'
-                 '<span class="cnt" id="%s-c"></span>%s</div></div>'
-                 % (nid, nid,
-                    '<span class="cnt over">auto-trimmed</span>' if r["note_trimmed"] else ""))
+        if r.get("with_note"):
+            p.append('<textarea id="%s" data-lim="%d" spellcheck="false">%s</textarea>'
+                     % (nid, lim, e(r["note"])))
+            p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy note</button>'
+                     '<span class="cnt" id="%s-c"></span>%s</div></div>'
+                     % (nid, nid,
+                        '<span class="cnt over">auto-trimmed</span>' if r["note_trimmed"] else ""))
+        else:
+            aid = nid + "a"
+            p.append('<div class="plain">Connect with <b>no note</b>. Send this as a DM once '
+                     "they accept:</div>")
+            p.append('<textarea id="%s" data-lim="1200" spellcheck="false">%s</textarea>'
+                     % (aid, e(r["after_accept"])))
+            p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy follow-up</button>'
+                     '<span class="cnt" id="%s-c"></span></div></div>' % (aid, aid))
 
     if followups:
         p.append("<h2>Follow-ups due</h2>")
@@ -425,19 +482,29 @@ def cmd_build(args):
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["rank", "company", "persona", "role", "location", "applied",
-                    "note", "note_chars", "search_url_1", "search_url_2"])
+                    "with_note", "note", "note_chars", "after_accept",
+                    "search_url_1", "search_url_2"])
         for i, r in enumerate(chosen, 1):
             u = r["urls"] + ["", ""]
             w.writerow([i, r["company"], r["persona"], r["role"], r["location"],
-                        "yes" if r["applied"] else "", r["note"], len(r["note"]), u[0], u[1]])
+                        "yes" if r["applied"] else "",
+                        "yes" if r.get("with_note") else "no",
+                        r["note"] if r.get("with_note") else "", len(r["note"]),
+                        "" if r.get("with_note") else r["after_accept"], u[0], u[1]])
 
     found = sorted(applied) or ["(none yet)"]
     print("Application log -> %d companies: %s" % (len(applied), ", ".join(found)))
     missing = [p for p in log_paths if not os.path.isfile(p)]
     for m in missing:
         print("  note: log not found, skipped -> %s" % m)
+    nlim, nbudget = note_limit_for(profile, personas_cfg)
+    used = notes_used_this_month(sent)
     print("Queue: %d targets today (%d possible), %d follow-ups due"
           % (len(chosen), len(every), len(followups)))
+    print("Notes: %d of today's targets get a personalised note (%s chars max); "
+          "monthly budget %s, used %d"
+          % (sum(1 for r in chosen if r.get("with_note")), nlim,
+             "unlimited" if nbudget > 900 else nbudget, used))
     print("  HTML: %s" % html_path)
     print("  CSV : %s" % csv_path)
     if args.open:
@@ -455,7 +522,8 @@ def cmd_log(args):
     append_sent({
         "date": args.date or TODAY.isoformat(), "company": args.company,
         "persona": args.persona, "person_name": args.name, "person_url": args.url or "",
-        "role": args.role or "", "note_sent": args.note or "", "status": "sent",
+        "role": args.role or "", "with_note": "yes" if args.with_note else "no",
+        "note_sent": args.note or "", "status": "sent",
         "status_date": "", "notes": "",
     })
     print("Logged: %s / %s / %s" % (args.company, args.persona, args.name))
@@ -533,6 +601,8 @@ def main():
     l.add_argument("--url")
     l.add_argument("--role")
     l.add_argument("--note")
+    l.add_argument("--with-note", dest="with_note", action="store_true",
+                   help="you attached a personalised note (counts against the monthly budget)")
     l.add_argument("--date")
     l.set_defaults(fn=cmd_log)
 

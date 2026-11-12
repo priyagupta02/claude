@@ -51,6 +51,25 @@ python3 build_queue.py log --company "General Mills" --persona recruiter_inhouse
 - Capped at 2 people per company per run and 12 invites per day
 - Any company/persona pair contacted in the last 45 days is skipped
 
+## Free vs Premium
+
+LinkedIn treats personalised invite notes very differently by account type, and
+`config/profile.json` -> `linkedin_account` -> `type` must say which you have:
+
+| | Free | Premium |
+|---|---|---|
+| Personalised notes | ~3 per month | unlimited |
+| Note length | 200 chars | 300 chars |
+
+On **premium** every target in the queue gets a note. On **free** the queue spends
+the 3 monthly notes on hiring managers and peers first, marks everyone else
+`plain invite`, and gives you an *after they accept* DM instead — which has no
+length limit and costs nothing from the budget. The monthly count is tracked in the
+sent log, so it resets on its own.
+
+Weekly invite volume (~100/week, note or no note) is a separate limit and applies
+to both; that is what `invites_per_day` protects.
+
 ## Configuration
 
 **`config/profile.json`** — who you are, target titles, locations, filters, company

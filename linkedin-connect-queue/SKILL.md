@@ -19,7 +19,12 @@ entry-level **AI & Automation / D&T analyst** roles in India. It runs alongside
 3. **Honesty**, per `config/profile.json` → `honesty_rules`. She was never titled
    Business Analyst; Somany was Graduate Engineer Trainee (SAP/CRM functional). No
    production SQL, no ML engineering, no invented mutual connections or referrals.
-4. **Stay under the cap.** `invites_per_day` is 12 (≈84/week) against LinkedIn's
+4. **Respect the note budget.** `config/profile.json` -> `linkedin_account.type`
+   decides everything about notes: premium = unlimited at 300 chars, free = ~3 per
+   month at 200 chars. On a free account the queue marks most targets `plain
+   invite` and supplies an after-accept DM instead. Never tell her to send a note
+   the account cannot send.
+5. **Stay under the cap.** `invites_per_day` is 12 (≈84/week) against LinkedIn's
    ~100–200/week invite ceiling. Do not raise it to "move faster" — a restricted
    account costs her the whole network.
 

@@ -237,6 +237,8 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
                     else search_cfg["locations"][0])
 
         for pkey, p in personas.items():
+            if p.get("requires_found_post"):
+                continue  # only valid for a real post from Step 0; see render_html
             if recent_pairs.get((_norm(company), pkey)):
                 continue  # already worked this company/persona recently
             templates = p["notes"] if app else p.get("notes_not_applied", p["notes"])
@@ -448,6 +450,21 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
                 p.append('<a class="btn" target="_blank" rel="noopener" href="%s" title="%s">'
                          "Post search %d</a>" % (e(content_url(q, geo)), e(q), n))
             p.append("</div></div>")
+
+        for pkey, per in personas_cfg["personas"].items():
+            if not per.get("requires_found_post"):
+                continue
+            tpl = (per.get("notes_not_applied") or per["notes"])[0]
+            demo = tpl.format(first="{first_name}", company="{company}",
+                              a_role="{the role}", role="{the role}",
+                              company_poss="{company}", location="{city}",
+                              exp=cand["experience_label"])
+            p.append('<div class="card"><div class="top"><span class="co">%s</span>'
+                     '<span class="tag">use only for a post you actually found</span></div>'
+                     '<div class="plain">%s</div>' % (e(per["label"]), e(per["why"])))
+            p.append('<textarea id="pa" data-lim="%d" spellcheck="false">%s</textarea>' % (lim, e(demo)))
+            p.append('<div class="row2"><button onclick="cp(\'pa\',this)">Copy note</button>'
+                     '<span class="cnt" id="pa-c"></span></div></div>')
 
     p.append("<h2>Today&rsquo;s queue &mdash; %s</h2>"
              % ("companies from your applications" if applied

@@ -16,6 +16,11 @@
         "Hi {first}, saw {company} is hiring {a_role}. I'm an engineer ({exp}) deliberately moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery. Would value connecting and following how your team adopts AI.",
         "Hi {first}, saw {company_poss} {role} opening. Engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirements, now low-code. Would love to connect.",
         "Hi {first}, saw {company_poss} {role} role. Engineer moving into AI-enabled business analysis. Would love to connect."
+      ],
+      "notes_not_applied": [
+        "Hi {first}, I'm an engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI). I'm targeting AI & Automation analyst roles and following how teams like yours at {company} adopt AI. Would love to connect.",
+        "Hi {first}, engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirements, now low-code. Targeting AI & Automation analyst roles; following how your team at {company} adopts AI. Would love to connect.",
+        "Hi {first}, engineer ({exp}) moving into AI-enabled business analysis. Following how your team at {company} adopts AI - would love to connect."
       ]
     },
     "recruiter_inhouse": {
@@ -71,7 +76,7 @@
     "post_author": {
       "label": "Author of a hiring post",
       "weight": 55,
-      "why": "They published the opening themselves, so they are expecting inbound and often hold the referral. Highest priority in the brief.",
+      "why": "They published the opening themselves, so they are expecting inbound and often hold the referral. Use this ONLY for a post you actually found in Step 0.",
       "queries": [
         "\"{company}\" hiring (\"Business Analyst\" OR \"AI\" OR \"Automation\") post",
         "\"{company}\" (\"we are hiring\" OR \"DM me\" OR \"share your resume\")"
@@ -85,7 +90,8 @@
         "Hi {first}, saw your post about {a_role} at {company}. I'm an engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI). Would love to connect and send my CV across.",
         "Hi {first}, saw your post about {a_role} at {company}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. Would love to connect and share my CV.",
         "Hi {first}, saw your hiring post for {a_role}. Engineer ({exp}) moving into AI-enabled business analysis. Would love to connect."
-      ]
+      ],
+      "requires_found_post": true
     }
   },
   "followup_after_accept": "Thanks for connecting, {first}! I'm focused on AI & Automation / D&T analyst roles - {exp} as an engineer (SAP/CRM requirement gathering, now low-code delivery), B.Tech CSE (AI). If something entry-level opens at {company}, I'd love to be considered - happy to send my CV.",

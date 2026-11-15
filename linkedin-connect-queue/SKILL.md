@@ -28,6 +28,11 @@ entry-level **AI & Automation / D&T analyst** roles in India. It runs alongside
    ~100–200/week invite ceiling. Do not raise it to "move faster" — a restricted
    account costs her the whole network.
 
+## Schedule
+
+Runs daily at **7:00 PM**, after the 11 AM `dt-ai-automation-job-hunt` task, so it
+works against whatever that task logged the same day.
+
 ## Step 1 — Build the queue
 
 ```
@@ -44,6 +49,34 @@ applying to rank highest:
 Missing logs are skipped silently; the queue falls back to the configured company
 tiers. Output lands in `out/queue_<date>.html` (clickable) and `.csv`.
 
+## Step 1b — Work the hiring posts first
+
+The HTML opens with **Step 0 — live hiring posts**. Those are LinkedIn *content*
+searches, not people searches. A live post beats a cold company guess: the author
+is expecting inbound and usually holds the referral.
+
+Open them, look at posts from the last week, and for each genuinely matching post
+record: the author, their company, the role, the post URL, and **any email address
+or phone number the post publishes**. A published contact address is an explicit
+invitation to apply there — it is not scraped contact data.
+
+Add what you find to the report in Step 2. Do not connect or email on her behalf.
+
+## Step 1c — Email drafts for posts that publish a contact address
+
+For each post that published an email address, create a **Gmail draft** from
+priyagupta02022@gmail.com using `email_template` in `config/personas.json`:
+
+- Subject and body from the template, with the role, company and post specifics filled in.
+- **Attach** `/Users/priyagupta/Downloads/Priya_Gupta_BA_Resume.pdf`, or the tailored
+  PDF from `Downloads/Tailored_Resumes/` if one exists for that company and role.
+- **Save the draft. Never send it.** Same rule as her other job-hunt tasks: she
+  reviews and hits send.
+- Skip any address already in `project_ba_outreach_log.md` or the sent log.
+- Never guess or construct an address that the post did not publish.
+
+Phone numbers: list them in the report for her to use. Do not call or message them.
+
 ## Step 2 — Report in chat
 
 Tell her, briefly:
@@ -59,6 +92,11 @@ Do not paste the whole queue into chat. The HTML is the interface.
 
 ## Step 3 — After she sends
 
+Note the division of labour: **this task prepares, she sends.** It does not log into
+LinkedIn, send invites, send DMs, or send email. See the hard rules above.
+
+
+
 Each invite she actually sends gets logged so tomorrow's queue skips that person
 and the follow-up clock starts:
 
@@ -66,6 +104,11 @@ and the follow-up clock starts:
 python3 build_queue.py log --company "General Mills" --persona recruiter_inhouse \
                            --name "Full Name" --url "<profile url>"
 ```
+
+Once someone accepts, the card's second message — the **referral ask**, which names
+the open role and asks them to forward her CV — goes out as a DM with the resume
+attached. She sends it; remind her it exists, since that ask is the entire point of
+the connection.
 
 When someone accepts or replies:
 

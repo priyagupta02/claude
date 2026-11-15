@@ -189,6 +189,14 @@ def search_url(query, geo_urn=None):
     return "https://www.linkedin.com/search/results/people/?" + urllib.parse.urlencode(params)
 
 
+def content_url(query, geo_urn=None):
+    """LinkedIn CONTENT search - finds posts, not people."""
+    params = {"keywords": query, "datePosted": '"past-week"', "sortBy": '"date_posted"'}
+    if geo_urn:
+        params["geoUrn"] = json.dumps([geo_urn])
+    return "https://www.linkedin.com/search/results/content/?" + urllib.parse.urlencode(params)
+
+
 def jobs_url(titles, geo_urn=None):
     params = {"keywords": " OR ".join('"%s"' % t for t in titles[:4]), "f_TPR": "r1296000",
               "sortBy": "DD"}
@@ -279,8 +287,10 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
                                                         -r["score"]))):
         r["with_note"] = i < remaining
     for r in chosen:
-        r["after_accept"] = personas_cfg["followup_after_accept"].format(
-            first="{first_name}", company=r["company"], exp=cand["experience_label"])
+        r["after_accept"] = personas_cfg.get("referral_ask",
+            personas_cfg["followup_after_accept"]).format(
+                first="{first_name}", company=r["company"], role=r["role"],
+                exp=cand["experience_label"])
     return chosen, rows
 
 
@@ -401,16 +411,43 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
              % e(jobs_url(profile["search"]["target_titles"], profile["search"].get("india_geo_urn"))))
     p.append("</div>")
 
-    p.append('<div class="note"><b>How to work this queue.</b> Open a search link, pick a real person '
-             "who fits, then look at the badge. <b>WITH NOTE</b> &rarr; click Connect, choose "
-             "\u201cAdd a note\u201d, paste the note with <code>{first_name}</code> replaced. "
-             "<b>PLAIN INVITE</b> &rarr; just click Connect with no note, and send the "
-             "<i>after they accept</i> message as a normal DM once they do &mdash; that has no "
-             "character limit and does not spend your monthly note budget. Record each one with "
-             "<code>build_queue.py log</code> so tomorrow skips them. Send by hand: automating "
-             "invites gets accounts restricted.</div>")
+    if budget > 900:
+        p.append('<div class="note"><b>How to work this queue.</b> Open a search link, pick a real '
+                 "person who fits, click Connect, choose \u201cAdd a note\u201d and paste the note "
+                 "with <code>{first_name}</code> replaced. Once they accept, send the second message "
+                 "<b>with your CV attached</b> \u2014 that referral ask is the point of connecting. "
+                 "Record each one with <code>build_queue.py log</code> so tomorrow skips them. Send by "
+                 "hand: automating invites gets accounts restricted.</div>")
+    else:
+        p.append('<div class="note"><b>How to work this queue.</b> Open a search link, pick a real person '
+                 "who fits, then look at the badge. <b>WITH NOTE</b> \u2192 Connect, \u201cAdd a note\u201d, "
+                 "paste it with <code>{first_name}</code> replaced. <b>PLAIN INVITE</b> \u2192 Connect with no "
+                 "note. Either way, once they accept send the referral ask <b>with your CV attached</b>. "
+                 "Record each with <code>build_queue.py log</code>. Send by hand: automating invites gets "
+                 "accounts restricted.</div>")
 
-    p.append("<h2>Today&rsquo;s queue</h2>")
+    ps = personas_cfg.get("post_searches") or {}
+    if ps:
+        geo = profile["search"].get("india_geo_urn")
+        p.append("<h2>Step 0 &mdash; live hiring posts (do these first)</h2>")
+        p.append('<div class="plain">A live post beats a cold company guess: the author is '
+                 "expecting inbound and usually holds the referral. Open these, find posts from "
+                 "the last week, and connect with <b>the author</b>. If a post publishes an email "
+                 "or phone number, that is an invitation &mdash; apply there directly.</div>")
+        labels = {"technical_ownership": "Technical ownership roles",
+                  "role_match": "Your exact role titles",
+                  "contactable": "Posts that publish a contact address"}
+        for key, queries in ps.items():
+            if key.startswith("_"):
+                continue
+            p.append('<div class="card"><div class="top"><span class="co">%s</span></div>'
+                     '<div class="lnks">' % e(labels.get(key, key)))
+            for n, q in enumerate(queries, 1):
+                p.append('<a class="btn" target="_blank" rel="noopener" href="%s" title="%s">'
+                         "Post search %d</a>" % (e(content_url(q, geo)), e(q), n))
+            p.append("</div></div>")
+
+    p.append("<h2>Today&rsquo;s queue &mdash; companies from your applications</h2>")
     for i, r in enumerate(chosen, 1):
         nid = "n%d" % i
         p.append('<div class="card"><div class="top"><span class="rank">%d</span>'
@@ -432,14 +469,21 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
         if r.get("with_note"):
             p.append('<textarea id="%s" data-lim="%d" spellcheck="false">%s</textarea>'
                      % (nid, lim, e(r["note"])))
+            aid = nid + "a"
             p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy note</button>'
-                     '<span class="cnt" id="%s-c"></span>%s</div></div>'
+                     '<span class="cnt" id="%s-c"></span>%s</div>'
                      % (nid, nid,
                         '<span class="cnt over">auto-trimmed</span>' if r["note_trimmed"] else ""))
+            p.append('<div class="plain" style="margin-top:10px">After they accept, send this '
+                     "DM <b>with your CV attached</b>:</div>")
+            p.append('<textarea id="%s" data-lim="1200" spellcheck="false">%s</textarea>'
+                     % (aid, e(r["after_accept"])))
+            p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy referral ask</button>'
+                     '<span class="cnt" id="%s-c"></span></div></div>' % (aid, aid))
         else:
             aid = nid + "a"
-            p.append('<div class="plain">Connect with <b>no note</b>. Send this as a DM once '
-                     "they accept:</div>")
+            p.append('<div class="plain">Connect with <b>no note</b>. Once they accept, send '
+                     "this DM <b>with your CV attached</b>:</div>")
             p.append('<textarea id="%s" data-lim="1200" spellcheck="false">%s</textarea>'
                      % (aid, e(r["after_accept"])))
             p.append('<div class="row2"><button onclick="cp(\'%s\',this)">Copy follow-up</button>'

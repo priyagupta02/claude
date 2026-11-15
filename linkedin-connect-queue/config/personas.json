@@ -1,18 +1,16 @@
 {
   "_comment": "Four target personas. 'queries' are LinkedIn people-search keyword strings; {company} is substituted. 'notes' are tried longest-first and the first one that fits LinkedIn's 300-char invite limit wins.",
-
   "note_char_limit": 300,
-
   "personas": {
     "hiring_manager": {
-      "label": "Hiring manager / AI & data lead",
+      "label": "Senior technical / engineering lead",
       "weight": 40,
-      "why": "A yes here often converts straight to an interview. Slowest to accept.",
+      "why": "Owns the technical team the role sits in, senior enough to refer but close enough to the work to care. The brief's primary target.",
       "queries": [
-        "\"{company}\" (\"Head of Analytics\" OR \"Director Analytics\")",
-        "\"{company}\" (\"Data Science\" OR \"Decision Science\") (Head OR Director OR Manager)",
-        "\"{company}\" (\"AI\" OR \"Automation\") (Lead OR Manager OR Director)",
-        "\"{company}\" (\"Digital & Technology\" OR \"D&T\") (Manager OR Director)"
+        "\"{company}\" (\"Engineering Manager\" OR \"Tech Lead\" OR \"Technical Lead\")",
+        "\"{company}\" (\"Head of Engineering\" OR \"Director of Engineering\" OR \"Principal Engineer\" OR \"Staff Engineer\")",
+        "\"{company}\" (\"D&T\" OR \"Digital & Technology\") (Manager OR Lead OR Director)",
+        "\"{company}\" (\"AI\" OR \"Automation\" OR \"Data\") (Lead OR Manager OR Principal)"
       ],
       "notes": [
         "Hi {first}, saw {company} is hiring {a_role}. I'm an engineer ({exp}) deliberately moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery. Would value connecting and following how your team adopts AI.",
@@ -20,7 +18,6 @@
         "Hi {first}, saw {company_poss} {role} role. Engineer moving into AI-enabled business analysis. Would love to connect."
       ]
     },
-
     "recruiter_inhouse": {
       "label": "In-house recruiter / TA",
       "weight": 30,
@@ -36,7 +33,6 @@
         "Hi {first}, I've applied to {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI). Would love to connect."
       ]
     },
-
     "peer_in_role": {
       "label": "Peer already in the role",
       "weight": 20,
@@ -52,7 +48,6 @@
         "Hi {first}, you're in the {role} work I'm aiming for. Would love to connect and hear how you made the move."
       ]
     },
-
     "agency_recruiter": {
       "label": "Agency / staffing recruiter",
       "weight": 10,
@@ -67,10 +62,44 @@
         "Hi {first}, you place AI/analytics talent in India. Engineer ({exp}), B.Tech CSE (AI), targeting AI & Automation / D&T analyst roles (Delhi NCR/Mumbai/remote). Would love to connect.",
         "Hi {first}, engineer ({exp}) targeting AI & Automation / D&T analyst roles in India. Would love to connect."
       ]
+    },
+    "post_author": {
+      "label": "Author of a hiring post",
+      "weight": 55,
+      "why": "They published the opening themselves, so they are expecting inbound and often hold the referral. Highest priority in the brief.",
+      "queries": [
+        "\"{company}\" hiring (\"Business Analyst\" OR \"AI\" OR \"Automation\") post",
+        "\"{company}\" (\"we are hiring\" OR \"DM me\" OR \"share your resume\")"
+      ],
+      "notes": [
+        "Hi {first}, saw your post about {a_role} at {company}. I'm an engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI). I've applied; would love to connect and send my CV across.",
+        "Hi {first}, saw your post about {a_role} at {company}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. I've applied - would love to connect and share my CV.",
+        "Hi {first}, saw your hiring post for {a_role}. Engineer ({exp}) moving into AI-enabled business analysis. Would love to connect."
+      ]
     }
   },
-
   "followup_after_accept": "Thanks for connecting, {first}! I'm focused on AI & Automation / D&T analyst roles - {exp} as an engineer (SAP/CRM requirement gathering, now low-code delivery), B.Tech CSE (AI). If something entry-level opens at {company}, I'd love to be considered - happy to send my CV.",
-
-  "generic_role_fallback": "AI & Automation analyst"
+  "generic_role_fallback": "AI & Automation analyst",
+  "post_searches": {
+    "_comment": "LinkedIn CONTENT search (posts, not people). Run these first: a live hiring post beats a cold company guess, and the author is usually the person who can refer you.",
+    "technical_ownership": [
+      "hiring (\"technical ownership\" OR \"tech lead\" OR \"engineering manager\") India",
+      "hiring (\"AI\" OR \"automation\") analyst (\"technical\" OR \"engineering\") India",
+      "\"we are hiring\" (\"D&T\" OR \"Digital & Technology\") analyst India"
+    ],
+    "role_match": [
+      "hiring \"Business Analyst\" (AI OR GenAI OR automation) India",
+      "\"we are hiring\" \"AI Analyst\" OR \"Automation Analyst\" India",
+      "hiring \"low-code\" OR \"no-code\" analyst India"
+    ],
+    "contactable": [
+      "hiring analyst AI India (\"share your resume at\" OR \"send your CV to\" OR \"DM me your resume\")",
+      "hiring \"business analyst\" India \"@gmail.com\" OR \"@\" resume"
+    ]
+  },
+  "referral_ask": "Thanks for connecting, {first}! I saw {company} has an opening for {role}. I'm an engineer ({exp}) - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI) - and it lines up with where I'm deliberately heading. I've attached my CV; would you be open to forwarding it to the hiring team or pointing me to the right person? Either way, thanks for connecting.",
+  "email_template": {
+    "subject": "Application - {role} ({company})",
+    "body": "Hi {first},\n\nI saw your post about the {role} opening at {company} and wanted to apply directly, as you'd mentioned in it.\n\nI'm an engineer with {exp} of experience: SAP/CRM requirement gathering and business-tech liaison work at Somany Ceramics, and currently low-code (Digia) and Flutter delivery at Primathon, turning product requirements and Figma specs into shipped features. B.Tech CSE (AI), 2024. I'm moving deliberately into AI-enabled business analysis, which is exactly what this role is.\n\nMy CV is attached. I'm based in Gurugram and open to {locations}, on a 30-day notice.\n\nThank you for considering it.\n\nBest regards,\n{full_name}\n{phone} | {linkedin}"
+  }
 }

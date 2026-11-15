@@ -31,6 +31,11 @@
         "Hi {first}, I've applied to {company_poss} {role} ({location}). Engineer, {exp}: SAP/CRM requirement gathering plus low-code delivery, B.Tech CSE (AI). Moving into AI-enabled business analysis. Happy to share my CV - would love to connect.",
         "Hi {first}, I've applied to {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. Happy to share my CV - would love to connect.",
         "Hi {first}, I've applied to {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI). Would love to connect."
+      ],
+      "notes_not_applied": [
+        "Hi {first}, I'm interested in {company_poss} {role} ({location}). Engineer, {exp}: SAP/CRM requirement gathering plus low-code delivery, B.Tech CSE (AI). Moving into AI-enabled business analysis. Happy to share my CV - would love to connect.",
+        "Hi {first}, I'm interested in {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. Happy to share my CV - would love to connect.",
+        "Hi {first}, interested in {company_poss} {role}. Engineer ({exp}), B.Tech CSE (AI). Would love to connect."
       ]
     },
     "peer_in_role": {
@@ -75,6 +80,11 @@
         "Hi {first}, saw your post about {a_role} at {company}. I'm an engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI). I've applied; would love to connect and send my CV across.",
         "Hi {first}, saw your post about {a_role} at {company}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. I've applied - would love to connect and share my CV.",
         "Hi {first}, saw your hiring post for {a_role}. Engineer ({exp}) moving into AI-enabled business analysis. Would love to connect."
+      ],
+      "notes_not_applied": [
+        "Hi {first}, saw your post about {a_role} at {company}. I'm an engineer ({exp}) moving into AI-enabled business analysis - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI). Would love to connect and send my CV across.",
+        "Hi {first}, saw your post about {a_role} at {company}. Engineer ({exp}), B.Tech CSE (AI), SAP/CRM requirements + low-code. Would love to connect and share my CV.",
+        "Hi {first}, saw your hiring post for {a_role}. Engineer ({exp}) moving into AI-enabled business analysis. Would love to connect."
       ]
     }
   },
@@ -101,5 +111,6 @@
   "email_template": {
     "subject": "Application - {role} ({company})",
     "body": "Hi {first},\n\nI saw your post about the {role} opening at {company} and wanted to apply directly, as you'd mentioned in it.\n\nI'm an engineer with {exp} of experience: SAP/CRM requirement gathering and business-tech liaison work at Somany Ceramics, and currently low-code (Digia) and Flutter delivery at Primathon, turning product requirements and Figma specs into shipped features. B.Tech CSE (AI), 2024. I'm moving deliberately into AI-enabled business analysis, which is exactly what this role is.\n\nMy CV is attached. I'm based in Gurugram and open to {locations}, on a 30-day notice.\n\nThank you for considering it.\n\nBest regards,\n{full_name}\n{phone} | {linkedin}"
-  }
+  },
+  "referral_ask_generic": "Thanks for connecting, {first}! I'm an engineer ({exp}) - SAP/CRM requirement gathering, now low-code delivery, B.Tech CSE (AI) - moving deliberately into AI-enabled business analysis. I've attached my CV; if anything entry-level opens on your team at {company}, I'd love to be considered, or pointed to the right person. Either way, thanks for connecting."
 }

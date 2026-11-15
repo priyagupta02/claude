@@ -239,8 +239,9 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
         for pkey, p in personas.items():
             if recent_pairs.get((_norm(company), pkey)):
                 continue  # already worked this company/persona recently
+            templates = p["notes"] if app else p.get("notes_not_applied", p["notes"])
             note, trimmed = render_note(
-                p["notes"], note_limit,
+                templates, note_limit,
                 first="{first_name}", company=company, role=role,
                 company_poss=possessive(company),
                 a_role="%s %s" % (article_for(role), role),
@@ -287,10 +288,11 @@ def build_queue(profile, personas_cfg, applied, sent, limit=None):
                                                         -r["score"]))):
         r["with_note"] = i < remaining
     for r in chosen:
-        r["after_accept"] = personas_cfg.get("referral_ask",
-            personas_cfg["followup_after_accept"]).format(
-                first="{first_name}", company=r["company"], role=r["role"],
-                exp=cand["experience_label"])
+        tpl = (personas_cfg.get("referral_ask") if r["applied"]
+               else personas_cfg.get("referral_ask_generic"))
+        r["after_accept"] = (tpl or personas_cfg["followup_after_accept"]).format(
+            first="{first_name}", company=r["company"], role=r["role"],
+            exp=cand["experience_label"])
     return chosen, rows
 
 
@@ -447,7 +449,9 @@ def render_html(profile, personas_cfg, chosen, applied, followups, total_candida
                          "Post search %d</a>" % (e(content_url(q, geo)), e(q), n))
             p.append("</div></div>")
 
-    p.append("<h2>Today&rsquo;s queue &mdash; companies from your applications</h2>")
+    p.append("<h2>Today&rsquo;s queue &mdash; %s</h2>"
+             % ("companies from your applications" if applied
+                else "from the configured company list (no application log found)"))
     for i, r in enumerate(chosen, 1):
         nid = "n%d" % i
         p.append('<div class="card"><div class="top"><span class="rank">%d</span>'
